@@ -1,0 +1,16 @@
+<div *ngIf="isOpen"
+    class="top-0 left-0 z-[1055] fixed flex justify-end items-start bg-gray-800/50 w-full h-full"
+    (click)="handleClose($event)">
+    <div 
+        class="relative bg-white shadow-lg p-4 w-[30rem] h-full transform transition-transform duration-300 ease-out"
+        [class.translate-x-full]="!animateOpen" [class.translate-x-0]="animateOpen"
+        (click)="$event.stopPropagation()">
+        
+        <!-- Botón de cerrar -->
+        <button (click)="closeModal()" class="top-2 right-2 absolute text-red-600 hover:text-red-800">
+            <fa-icon [icon]="icons.times" size="lg"></fa-icon>
+        </button>
+        
+        <ng-content></ng-content>
+    </div>
+</div>

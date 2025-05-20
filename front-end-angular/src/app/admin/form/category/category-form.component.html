@@ -1,0 +1,43 @@
+<div class="p-4">
+    <form class="flex flex-col gap-6 p-2" [formGroup]="categoryForm" (ngSubmit)="handleSubmit()">
+      <div class="flex flex-col gap-2 p-2 max-h-[65vh] overflow-x-auto">
+        <label>Nombre</label>
+        <input
+          type="text"
+          class="p-2 border rounded"
+          formControlName="name"
+          [ngClass]="{'border-red-500': categoryForm.get('name')?.invalid && categoryForm.get('name')?.touched}"
+        />
+        <span *ngIf="categoryForm.get('name')?.invalid && categoryForm.get('name')?.touched" class="text-red-500">
+          El nombre es obligatorio.
+        </span>
+  
+        <label>Slug</label>
+        <input
+          type="text"
+          class="p-2 border rounded"
+          formControlName="slug"
+          [ngClass]="{'border-red-500': categoryForm.get('slug')?.invalid && categoryForm.get('slug')?.touched}"
+        />
+        <span *ngIf="categoryForm.get('slug')?.invalid && categoryForm.get('slug')?.touched" class="text-red-500">
+          El slug es obligatorio.
+        </span>
+  
+        <label>Estado</label>
+        <select class="p-2 border rounded" formControlName="status">
+          <option *ngFor="let option of statusOptions" [value]="option.id">{{ option.nombre }}</option>
+        </select>
+        <span *ngIf="categoryForm.get('status')?.invalid && categoryForm.get('status')?.touched" class="text-red-500">
+          El estado es obligatorio.
+        </span>
+      </div>
+  
+      <div class="flex justify-between px-2">
+        <button class="bg-blue-500 px-4 py-2 rounded text-white" type="submit">
+          {{ category ? 'Actualizar' : 'Crear' }}
+        </button>
+        <button class="px-4 py-2 border rounded" (click)="onClose.emit()" type="button">Cancelar</button>
+      </div>
+    </form>
+  </div>
+  

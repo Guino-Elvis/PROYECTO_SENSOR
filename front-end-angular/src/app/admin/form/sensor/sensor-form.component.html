@@ -1,0 +1,34 @@
+<div class="p-4">
+    <form class="flex flex-col gap-6 p-2" [formGroup]="sensorForm" (ngSubmit)="handleSubmit()">
+        <div class="flex flex-col gap-2 p-2 w-12/12 max-h-[65vh] overflow-x-auto">
+         <label class="font-bold text-[#283943] uppercase"> Nombre</label>
+            <input type="text"  class="p-2 border-[#0061A0] focus:border-[#0061A0] border-b-[0.2rem] focus:border-b-[0.2rem] rounded focus:outline-none focus:ring-0" formControlName="nombre"
+                [ngClass]="{'border-red-500': sensorForm.get('nombre')?.invalid && sensorForm.get('nombre')?.touched}" />
+            <span *ngIf="sensorForm.get('nombre')?.invalid && sensorForm.get('nombre')?.touched" class="text-red-500">
+                El nombre es obligatorio.
+            </span>
+
+           <label class="font-bold text-[#283943] uppercase"> Tipo</label>
+            <input type="text"  class="p-2 border-[#0061A0] focus:border-[#0061A0] border-b-[0.2rem] focus:border-b-[0.2rem] rounded focus:outline-none focus:ring-0" formControlName="tipo"
+                [ngClass]="{'border-red-500': sensorForm.get('tipo')?.invalid && sensorForm.get('tipo')?.touched}" />
+            <span *ngIf="sensorForm.get('tipo')?.invalid && sensorForm.get('tipo')?.touched" class="text-red-500">
+                El tipo es obligatorio.
+            </span>
+
+            <label class="font-bold text-[#283943] uppercase"> Estado</label>
+            <select  class="p-2 border-[#0061A0] focus:border-[#0061A0] border-b-[0.2rem] focus:border-b-[0.2rem] rounded focus:outline-none focus:ring-0" formControlName="estado">
+                <option *ngFor="let option of estadoOptions" [value]="option.id">{{ option.nombre }}</option>
+            </select>
+            <span *ngIf="sensorForm.get('estado')?.invalid && sensorForm.get('estado')?.touched" class="text-red-500">
+                El estado es obligatorio.
+            </span>
+        </div>
+
+            <div class="flex justify-between px-2 w-12/12">
+            <button class="bg-[#0061A0] py-2 rounded w-5/12 text-white" type="submit">
+                {{ sensor ? 'Actualizar' : 'Crear' }}
+            </button>
+            <button class="py-2 border border-gray-300 rounded w-5/12" (click)="onClose.emit()" type="button">Cancelar</button>
+        </div>
+    </form>
+</div>

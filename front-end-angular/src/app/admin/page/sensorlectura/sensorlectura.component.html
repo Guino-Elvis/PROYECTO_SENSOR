@@ -1,0 +1,57 @@
+<div class="flex justify-center items-center bg-white px-4 rounded-md w-auto h-auto">
+    <div *ngIf="sensor" class="flex flex-col w-full">
+
+        <div class="flex justify-between items-center">
+            <div class="flex flex-col gap-2">
+                <h2 *ngIf="!loading && sensor" class="font-bold text-[#283943] text-xl uppercase">{{
+                    sensor.nombre ??
+                    'no datos' }}
+                </h2>
+            </div>
+
+
+            <button (click)=cerrarDetalle()>
+                x
+            </button>
+        </div>
+
+        <div class="flex flex-wrap-reverse justify-between gap-2 pt-4">
+            <div class="flex flex-wrap-reverse justify-center items-center gap-4">
+
+
+            </div>
+        </div>
+        <div class="pt-4 rounded-lg max-h-[25rem] overflow-hidden hover:overflow-auto">
+            <table
+                class="border border-gray-300 rounded-lg w-full text-left border-separate border-spacing-0 table-auto">
+                <thead class="top-0 z-10 sticky bg-white rounded-t-lg uppercase">
+                    <tr>
+                        <th class="px-4 py-2 border-gray-300 border-b-2 text-[#283943] text-sm">Sensor</th>
+                        <th class="px-4 py-2 border-gray-300 border-b-2 text-[#283943] text-sm">Valor 1</th>
+                        <th class="px-4 py-2 border-gray-300 border-b-2 text-[#283943] text-sm">Valor 2</th>
+                        <th class="px-4 py-2 border-gray-300 border-b-2 text-[#283943] text-sm">Fecha</th>
+
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr *ngIf="sensor.lectura && sensor.lectura.length === 0">
+                        <td colspan="20" class="py-4 text-center">
+                            <div class="flex justify-center items-center">
+                                <app-no-item-page />
+                            </div>
+                        </td>
+                    </tr>
+                    <tr *ngFor="let lecturas of sensor.lectura">
+                        <td class="px-4 py-2 border-gray-300 border-b"> {{ sensor.nombre ?? 'no datos'}}</td>
+                        <td class="px-4 py-2 border-gray-300 border-b"> {{ lecturas?.valor1 ?? 'no datos'}}</td>
+                        <td class="px-4 py-2 border-gray-300 border-b"> {{ lecturas?.valor2 ?? 'no datos'}}</td>
+                        <!-- <td class="px-4 py-2 border-gray-300 border-b"> {{ lecturas?.fecha ?? 'no datos'}}</td> -->
+                        <td class="px-4 py-2 border-gray-300 border-b">
+                            <app-item-updated-at [updated_at]="lecturas?.fecha ?? null"></app-item-updated-at>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>

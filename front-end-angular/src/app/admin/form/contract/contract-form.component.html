@@ -1,0 +1,81 @@
+<div class="p-4">
+    <form class="flex flex-col gap-6 p-2" [formGroup]="contractForm" (ngSubmit)="handleSubmit()">
+
+        <div class="flex flex-col gap-2 p-2 max-h-[65vh] overflow-x-auto">
+
+            <label class="font-bold text-[#283943] uppercase">nombre de la hoja</label>
+            <input type="text" placeholder="Nombre de la Hoja *"
+                class="p-2 border-[#0061A0] focus:border-[#0061A0] border-b-[0.2rem] focus:border-b-[0.2rem] rounded focus:outline-none focus:ring-0"
+                formControlName="sheet_name"
+                [ngClass]="{'border-red-500': contractForm.get('sheet_name')?.invalid && contractForm.get('sheet_name')?.touched}" />
+            <span *ngIf="contractForm.get('sheet_name')?.invalid && contractForm.get('sheet_name')?.touched"
+                class="text-red-500">
+                nombre de la hoja es obligatorio.
+            </span>
+
+
+            <label class="font-bold text-[#283943] uppercase">fila de la hoja </label>
+            <input type="text" placeholder="Fila donde empezara *"
+                class="p-2 border-[#0061A0] focus:border-[#0061A0] border-b-[0.2rem] focus:border-b-[0.2rem] rounded focus:outline-none focus:ring-0"
+                formControlName="start_row"
+                [ngClass]="{'border-red-500': contractForm.get('start_row')?.invalid && contractForm.get('start_row')?.touched}" />
+            <span *ngIf="contractForm.get('start_row')?.invalid && contractForm.get('start_row')?.touched"
+                class="text-red-500">
+                fila de la hoja es obligatorio.
+            </span>
+
+            <label class="font-bold text-[#283943] uppercase">archivo excel</label>
+            <input type="file" id="file"
+                class="p-2 border-[#0061A0] focus:border-[#0061A0] border-b-[0.2rem] focus:border-b-[0.2rem] rounded focus:outline-none focus:ring-0"
+                (change)="onFileChange($event)" required />
+            <span *ngIf="contractForm.get('file')?.hasError('required') && contractForm.get('file')?.touched"
+                class="text-red-500">
+                El archivo es obligatorio.
+            </span>
+
+
+            <div *ngIf="isAdmin" class="w-full">
+                <label class="font-bold text-[#283943] uppercase"> Compañia a la que pertenece el contrato* </label>
+                <select
+                    class="p-2 border-[#0061A0] focus:border-[#0061A0] border-b-[0.2rem] focus:border-b-[0.2rem] rounded focus:outline-none focus:ring-0 w-full"
+                    formControlName="company_id"
+                    [ngClass]="{'border-red-500': contractForm.get('company_id')?.invalid && contractForm.get('company_id')?.touched}">
+                    <option *ngFor="let company of companyOptions" [value]="company.id">
+                        {{ company.ra_social }}
+
+                    </option>
+                </select>
+                <span *ngIf="contractForm.get('company_id')?.invalid && contractForm.get('company_id')?.touched"
+                    class="text-red-500">
+                    El Contrato es obligatorio.
+                </span>
+            </div>
+
+            <label class="font-bold text-[#283943] uppercase"> Estado</label>
+            <select
+                class="p-2 border-[#0061A0] focus:border-[#0061A0] border-b-[0.2rem] focus:border-b-[0.2rem] rounded focus:outline-none focus:ring-0"
+                formControlName="status"
+                [ngClass]="{'border-red-500': contractForm.get('status')?.invalid && contractForm.get('status')?.touched}">
+                <option *ngFor="let option of statusOptions" [value]="option.id">{{ option.nombre }}</option>
+            </select>
+            <span *ngIf="contractForm.get('status')?.invalid && contractForm.get('status')?.touched"
+                class="text-red-500">
+                El estado es obligatorio.
+            </span>
+
+        </div>
+        <ng-container *ngIf="!isSaving">
+            <div class="flex justify-between px-2 w-12/12">
+                <button class="bg-[#0061A0] py-2 rounded w-5/12 text-white" type="submit"
+                    [disabled]="!contractForm.valid" [ngClass]="{'opacity-50 cursor-not-allowed': !contractForm.valid}">
+                    {{ contract ? 'Actualizar' : 'Crear' }}
+                </button>
+                <button class="py-2 border border-gray-300 rounded w-5/12" (click)="onClose.emit()"
+                    type="button">Cancelar</button>
+            </div>
+        </ng-container>
+        <ng-container *ngIf="isSaving">
+            <span class="border-4 border-t-transparent border-blue-400 rounded-full w-5 h-5 animate-spin"></span>
+        </ng-container>
+    </form>
+</div>
