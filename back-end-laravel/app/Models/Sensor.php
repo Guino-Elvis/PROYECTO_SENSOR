@@ -11,6 +11,8 @@ class Sensor extends Model
 
     protected $fillable = [
         'nombre',
+        'unidad1',
+        'unidad2',
         'tipo',
         'estado',
     ];

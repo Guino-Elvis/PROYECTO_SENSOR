@@ -27,10 +27,14 @@
                 <thead class="top-0 z-10 sticky bg-white rounded-t-lg uppercase">
                     <tr>
                         <th class="px-4 py-2 border-gray-300 border-b-2 text-[#283943] text-sm">Sensor</th>
-                        <th class="px-4 py-2 border-gray-300 border-b-2 text-[#283943] text-sm">Valor 1</th>
-                        <th class="px-4 py-2 border-gray-300 border-b-2 text-[#283943] text-sm">Valor 2</th>
+                        <th class="px-4 py-2 border-gray-300 border-b-2 text-[#283943] text-sm">
+                            {{ valor1Header }}
+                        </th>
+                        <th *ngIf="showValor2Column"
+                            class="px-4 py-2 border-gray-300 border-b-2 text-[#283943] text-sm">
+                            {{ valor2Header }}
+                        </th>
                         <th class="px-4 py-2 border-gray-300 border-b-2 text-[#283943] text-sm">Fecha</th>
-
                     </tr>
                 </thead>
                 <tbody>
@@ -42,10 +46,19 @@
                         </td>
                     </tr>
                     <tr *ngFor="let lecturas of sensor.lectura">
-                        <td class="px-4 py-2 border-gray-300 border-b"> {{ sensor.nombre ?? 'no datos'}}</td>
-                        <td class="px-4 py-2 border-gray-300 border-b"> {{ lecturas?.valor1 ?? 'no datos'}}</td>
-                        <td class="px-4 py-2 border-gray-300 border-b"> {{ lecturas?.valor2 ?? 'no datos'}}</td>
-                        <!-- <td class="px-4 py-2 border-gray-300 border-b"> {{ lecturas?.fecha ?? 'no datos'}}</td> -->
+                        <td class="px-4 py-2 border-gray-300 border-b"> {{ sensor.nombre ?? 'no datos' }}</td>
+
+                        <!-- Valor 1 con sufijo -->
+                        <td class="px-4 py-2 border-gray-300 border-b">
+                            {{ lecturas?.valor1 ?? 'no datos' }} {{ getValor1Suffix() }}
+                        </td>
+
+                        <!-- Valor 2 solo si aplica -->
+                        <td *ngIf="showValor2Column && lecturas.valor2 != null && +lecturas.valor2 !== 0"
+                            class="px-4 py-2 border-gray-300 border-b">
+                            {{ lecturas.valor2 }} {{ getValor2Suffix() }}
+                        </td>
+
                         <td class="px-4 py-2 border-gray-300 border-b">
                             <app-item-updated-at [updated_at]="lecturas?.fecha ?? null"></app-item-updated-at>
                         </td>

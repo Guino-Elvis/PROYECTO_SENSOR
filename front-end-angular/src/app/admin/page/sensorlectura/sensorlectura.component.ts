@@ -69,6 +69,46 @@ export class SensorlecturaComponent {
     });
   }
 
+  get valor1Header(): string {
+    if (this.sensor?.nombre === "DHT11" && this.sensor?.tipo === "TempHum") {
+      return "TEM";
+    } else if (this.sensor?.tipo === "Gases" || this.sensor?.tipo === "CO") {
+      return this.sensor.tipo;
+    }
+    return "Valor 1"; // default fallback
+  }
+
+  get showValor2Column(): boolean {
+    // Mostrar solo si es DHT11 TempHum, que tiene valor 2, de lo contrario no
+    return this.sensor?.nombre === "DHT11" && this.sensor?.tipo === "TempHum";
+  }
+
+  get valor2Header(): string {
+    if (this.showValor2Column) {
+      return "HUM";
+    }
+    return "";
+  }
+
+  isTempHum(): boolean {
+    return this.sensor?.nombre === "DHT11" && this.sensor?.tipo === "TempHum";
+  }
+
+  getValor1Suffix(): string {
+    if (this.isTempHum()) {
+      return "°C";
+    } else if (this.sensor?.tipo) {
+      return this.sensor.tipo; // "Gases", "CO", etc.
+    }
+    return "";
+  }
+
+  getValor2Suffix(): string {
+    if (this.isTempHum()) {
+      return "%";
+    }
+    return "";
+  }
 
   cerrarDetalle(): void {
     this.onClose.emit();

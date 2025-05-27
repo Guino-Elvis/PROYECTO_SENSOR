@@ -1,0 +1,84 @@
+#include <WiFi.h>
+#include <HTTPClient.h>
+#include "DHT.h"
+
+#define WIFI_SSID "DD"
+#define WIFI_PASSWORD "12345678"
+
+#define DHTPIN 4
+#define DHTTYPE DHT11
+DHT dht(DHTPIN, DHTTYPE);
+
+#define MQ7_PIN 34
+#define MQ135_PIN 35
+
+void setup() {
+  Serial.begin(115200);
+  delay(1000);
+  Serial.println("\n🟡 Iniciando conexión WiFi...");
+
+  WiFi.mode(WIFI_STA);
+  WiFi.begin(WIFI_SSID, WIFI_PASSWORD);
+
+  unsigned long startAttemptTime = millis();
+  while (WiFi.status() != WL_CONNECTED && millis() - startAttemptTime < 20000) {
+    Serial.print(".");
+    delay(500);
+  }
+
+  if (WiFi.status() == WL_CONNECTED) {
+    Serial.println("\n✅ Conectado al WiFi!");
+    Serial.print("IP: ");
+    Serial.println(WiFi.localIP());
+  } else {
+    Serial.println("\n❌ No se pudo conectar al WiFi.");
+  }
+
+  dht.begin();
+}
+
+void enviarDatos(String nombre_sensor, String tipo, float valor1, float valor2 = 0) {
+  HTTPClient http;
+  http.begin("http://192.168.0.106/insertar.php");  // Cambia por la IP de tu servidor PHP
+  http.addHeader("Content-Type", "application/x-www-form-urlencoded");
+
+  String datos = "nombre_sensor=" + nombre_sensor +
+                 "&tipo=" + tipo +
+                 "&valor1=" + String(valor1) +
+                 "&valor2=" + String(valor2);
+
+  int codigoRespuesta = http.POST(datos);
+  if (codigoRespuesta > 0) {
+    String cuerpoRespuesta = http.getString();
+    Serial.println("📨 Respuesta (" + nombre_sensor + "): " + cuerpoRespuesta);
+  } else {
+    Serial.println("❌ Error al enviar datos de " + nombre_sensor);
+  }
+  http.end();
+}
+
+void loop() {
+  if (WiFi.status() == WL_CONNECTED) {
+    float temperatura = dht.readTemperature();
+    float humedad = dht.readHumidity();
+    int valor_mq7 = analogRead(MQ7_PIN);
+    int valor_mq135 = analogRead(MQ135_PIN);
+
+    if (isnan(temperatura) || isnan(humedad)) {
+      Serial.println("❌ Error al leer DHT11");
+      return;
+    }
+
+    Serial.printf("Temperatura: %.1f C, Humedad: %.1f%%, MQ-7: %d, MQ-135: %d\n",
+                  temperatura, humedad, valor_mq7, valor_mq135);
+
+    // Enviar datos de cada sensor con nombre y tipo
+    enviarDatos("DHT11", "ambiente", temperatura, humedad);
+    enviarDatos("MQ7", "gas", valor_mq7, 0);
+    enviarDatos("MQ135", "gas", valor_mq135, 0);
+  } else {
+    Serial.println("❌ WiFi no conectado.");
+  }
+
+  delay(10000);  // Esperar 10 segundos antes del siguiente envío
+}

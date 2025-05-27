@@ -15,8 +15,8 @@ class SensorSeeder extends Seeder
     public function run(): void
     {
         DB::table('configurations')->insert([
-            'nombre_config' => 'intervalo_muestreo',
-            'valor' => '60',
+            'nombre_config' => 'intervalo_insercion',
+            'valor' => '120',
             'created_at' => now(),
             'updated_at' => now(),
         ]);
@@ -25,7 +25,7 @@ class SensorSeeder extends Seeder
             ['nombre' => "DHT11", 'tipo' => "TempHum"],
             ['nombre' => "MQ135", 'tipo' => "Gases"],
             ['nombre' => "MQ7", 'tipo' => "CO"],
-            ['nombre' => "LM35", 'tipo' => "Temperatura"],
+            // ['nombre' => "LM35", 'tipo' => "Temperatura"],
         ];
 
         foreach ($sensores as $sensor) {
@@ -37,16 +37,16 @@ class SensorSeeder extends Seeder
                 'updated_at' => now(),
             ]);
 
-            for ($i = 0; $i < 5; $i++) {
-                DB::table('lecturas')->insert([
-                    'valor1' => rand(10, 100),
-                    'valor2' => rand(10, 100),
-                    'fecha' => Carbon::now()->subDays($i)->subHours(rand(0, 12))->subMinutes(rand(0, 59))->subSeconds(rand(0, 59)),
-                    'sensor_id' => $sensorId,
-                    'created_at' => now(),
-                    'updated_at' => now(),
-                ]);
-            }
+            // for ($i = 0; $i < 5; $i++) {
+            //     DB::table('lecturas')->insert([
+            //         'valor1' => rand(10, 100),
+            //         'valor2' => rand(10, 100),
+            //         'fecha' => Carbon::now()->subDays($i)->subHours(rand(0, 12))->subMinutes(rand(0, 59))->subSeconds(rand(0, 59)),
+            //         'sensor_id' => $sensorId,
+            //         'created_at' => now(),
+            //         'updated_at' => now(),
+            //     ]);
+            // }
         }
     }
 }

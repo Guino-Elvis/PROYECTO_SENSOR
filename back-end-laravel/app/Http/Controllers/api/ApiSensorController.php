@@ -51,7 +51,23 @@ class ApiSensorController extends Controller
         $sortOrder = in_array(strtolower($sortOrder), ['asc', 'desc']) ? $sortOrder : 'desc';
         $sensors = $query->orderBy('created_at', $sortOrder)->paginate($perPage);
         return response()->json(
-            $sensors, 
+            $sensors,
+            Response::HTTP_OK
+        );
+    }
+
+    public function grafico()
+    {
+
+        $user =  User::find(Auth::id());
+        if (!$user) {
+            return response()->json(['error' => 'No autenticado'], Response::HTTP_UNAUTHORIZED);
+        }
+
+        $sensors = Sensor::with(['lectura'])->get();
+
+        return response()->json(
+            $sensors,
             Response::HTTP_OK
         );
     }

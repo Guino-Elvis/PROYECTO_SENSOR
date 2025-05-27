@@ -41,12 +41,11 @@ Route::prefix('admin')->middleware('auth:sanctum')->group(function () {
     Route::apiResource('categories', ApiCategoryController::class)->middleware('can:admin.categories');
     Route::apiResource('companies', ApiCompanyController::class)->middleware('can:admin.companies');
     Route::apiResource('configurations', ApiConfigurationController::class)->middleware('can:admin.configurations');
-    Route::apiResource('sensores',ApiSensorController::class)->middleware('can:admin.sensores');
-   
+    Route::apiResource('sensores', ApiSensorController::class)->middleware('can:admin.sensores');
+    Route::get('sensores_grafico', [ApiSensorController::class, 'grafico'])->middleware('can:admin.sensores');
+
 
     Route::apiResource('administration_user',  ApiUserAdministrationCompanyController::class)->middleware('can:admin.usercompanies');
     Route::apiResource('role',  RoleController::class)->middleware('can:admin.roles');
     Route::apiResource('users',  ApiUserController::class)->middleware('can:admin.users');
-
-  
 });

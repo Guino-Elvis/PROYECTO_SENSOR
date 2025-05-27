@@ -71,6 +71,20 @@ export class SensorService {
     );
   }
 
+    getSensorGrafico(): Observable<Sensor> {
+    return this.apiService.get<Sensor>(`${this.endpoint}_grafico`).pipe(
+      tap(() => this.toast.success('Sensor cargado correctamente', {
+        position: 'bottom-right',
+      })),
+      catchError((error) => {
+        this.toast.error('Error al cargar picking', {
+          position: 'bottom-right',
+        });
+        throw error;
+      })
+    );
+  }
+
   createSensor(sensor: Sensor): Observable<Sensor> {
 
     return this.apiService.post<Sensor>(`${this.endpoint}`, sensor);
