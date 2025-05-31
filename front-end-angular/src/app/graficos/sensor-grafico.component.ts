@@ -61,7 +61,7 @@ export class SensorGraficoComponent implements OnChanges, AfterViewInit {
     const lecturas = this.sensor.lectura || [];
     if (lecturas.length === 0) return;
 
-    const minutos = 5
+    const minutos = 1
     const intervaloMuestreo = minutos * 60 * 1000; // 10 minutos en milisegundos
 
     // Primero, ordenar lecturas por fecha (por si acaso)
