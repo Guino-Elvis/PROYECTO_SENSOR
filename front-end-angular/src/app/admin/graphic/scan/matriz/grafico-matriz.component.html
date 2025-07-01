@@ -1,0 +1,70 @@
+<div class="bg-white shadow-lg border border-gray-100 rounded-2xl overflow-hidden">
+  <!-- Encabezado -->
+  <div class="p-5 border-gray-100 border-b">
+    <h3 class="font-semibold text-[#1e2939] text-xl">📊 Matriz de Riesgo vs Confianza</h3>
+    <p class="mt-1 text-gray-500 text-sm">Distribución de vulnerabilidades por nivel de riesgo y confianza</p>
+  </div>
+
+  <!-- Tabla -->
+  <div class="overflow-x-auto">
+    <table class="w-full text-sm border-separate border-spacing-0">
+      <thead>
+        <tr class="bg-white text-[#1e2939] text-xs uppercase tracking-wider">
+          <th class="p-4 border-gray-100 border-b text-left">🔒 Riesgo \ Confianza</th>
+          <th *ngFor="let c of confianzas" class="p-4 border-gray-100 border-b">{{ c }}</th>
+          <th class="p-4 border-gray-100 border-b">Total</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let r of riesgos" class="hover:bg-[#f9f9f9] transition">
+          <!-- Riesgo -->
+          <td class="flex items-center gap-2 p-4 border-gray-100 border-b font-medium text-[#1e2939]">
+            <span class="inline-block rounded-full w-3 h-3" [style.backgroundColor]="riskColors[r]"></span>
+            {{ r }}
+          </td>
+
+          <!-- Celdas -->
+          <td *ngFor="let c of confianzas"
+              class="relative p-4 border-gray-100 border-b rounded-lg font-semibold text-center"
+              [style.backgroundColor]="getCellColor(r, c, getValorCelda(r, c))"
+              [style.color]="getTextColor(getCellColor(r, c, getValorCelda(r, c)))">
+            {{ getValorCelda(r, c) }}
+            <div
+              class="hidden top-full left-1/2 z-10 absolute group-hover:flex bg-[#1e2939] shadow-lg mt-1 px-2 py-1 rounded text-white text-xs whitespace-nowrap -translate-x-1/2">
+              {{ r }} / {{ c }}: {{ getValorCelda(r, c) }} vulnerabilidad(es)
+            </div>
+          </td>
+
+          <!-- Total por fila -->
+          <td class="p-4 border-gray-100 border-b font-bold text-[#0061a0] text-center">
+            {{ getTotalRiesgo(r) }}
+          </td>
+        </tr>
+      </tbody>
+
+      <!-- Totales -->
+      <tfoot>
+        <tr class="bg-white">
+          <td class="p-4 border-gray-100 border-t font-semibold text-[#1e2939]">Total</td>
+          <td *ngFor="let c of confianzas" class="p-4 border-gray-100 border-t font-semibold text-[#1e2939] text-center">
+            {{ getTotalConfianza(c) }}
+          </td>
+          <td class="p-4 border-gray-100 border-t font-bold text-[#0061a0] text-center">
+            {{ scanData.total_vulnerabilities || 0 }}
+          </td>
+        </tr>
+      </tfoot>
+    </table>
+  </div>
+
+
+  <!-- Leyenda -->
+  <div class="bg-white p-4 border-gray-100 border-t text-[#1e2939] text-xs">
+    <div class="flex flex-wrap justify-center gap-4">
+      <div *ngFor="let r of riesgos" class="flex items-center gap-2">
+        <span class="inline-block rounded-full w-3 h-3" [style.backgroundColor]="riskColors[r]"></span>
+        {{ r }}
+      </div>
+    </div>
+  </div>
+</div>

@@ -71,13 +71,29 @@ export class SensorService {
     );
   }
 
-    getSensorGrafico(): Observable<Sensor> {
-    return this.apiService.get<Sensor>(`${this.endpoint}_grafico`).pipe(
+  getSensorGrafico(
+    tipo: string | null = null,
+    tiempo: string | null = null,
+  ): Observable<any> {
+    const params: string[] = [];
+
+    if (tipo) {
+      params.push(`tipo=${encodeURIComponent(tipo)}`);
+    }
+
+    if (tiempo) {
+      params.push(`tiempo=${encodeURIComponent(tiempo)}`);
+    }
+
+    const queryString = params.length ? `?${params.join('&')}` : '';
+    const url = `${this.endpoint}_grafico${queryString}`;
+
+    return this.apiService.get(url).pipe(
       tap(() => this.toast.success('Sensor cargado correctamente', {
         position: 'bottom-right',
       })),
       catchError((error) => {
-        this.toast.error('Error al cargar picking', {
+        this.toast.error('Error al cargar sensores', {
           position: 'bottom-right',
         });
         throw error;
@@ -93,7 +109,7 @@ export class SensorService {
   updateSensor(id: number, sensor: Sensor): Observable<Sensor> {
     return this.apiService.put<Sensor>(this.endpoint, id, sensor);
   }
-  
+
   deleteSensor(id: number): Observable<void> {
     return this.apiService.delete<void>(this.endpoint, id).pipe(
       tap(() => this.toast.success('item eliminado con éxito', {

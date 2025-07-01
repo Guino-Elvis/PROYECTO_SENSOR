@@ -56,21 +56,85 @@ class ApiSensorController extends Controller
         );
     }
 
-    public function grafico()
+    public function grafico(Request $request)
     {
-
-        $user =  User::find(Auth::id());
+        $user = Auth::user();
         if (!$user) {
             return response()->json(['error' => 'No autenticado'], Response::HTTP_UNAUTHORIZED);
         }
 
-        $sensors = Sensor::with(['lectura'])->get();
+        $tipoFiltro = $request->query('tipo', null);
+        $tiempo = $request->query('tiempo', null);
 
-        return response()->json(
-            $sensors,
-            Response::HTTP_OK
-        );
+        // Si no hay filtros, retornar todo
+        if (!$tipoFiltro && !$tiempo) {
+            $sensores = Sensor::with('lectura')->get();
+            return response()->json($sensores, Response::HTTP_OK);
+        }
+
+        // Calcular "desde" solo si se envía tiempo
+        $desde = null;
+        if ($tiempo) {
+            $desde = match ($tiempo) {
+                '60m' => Carbon::now()->subMinutes(60),
+                '6h'  => Carbon::now()->subHours(6),
+                '12h' => Carbon::now()->subHours(12),
+                '24h' => Carbon::now()->subHours(24),
+                '7d'  => Carbon::now()->subDays(7),
+                '30d' => Carbon::now()->subDays(30),
+                default => Carbon::now()->subHour(),
+            };
+        }
+
+        // Caso especial para Temp, Hum, TempHum
+        if (in_array($tipoFiltro, ['Temp', 'Hum', 'TempHum'])) {
+            $sensor = Sensor::where('tipo', 'TempHum')
+                ->where('id', 1)
+                ->with(['lectura' => function ($query) use ($desde) {
+                    if ($desde) {
+                        $query->where('created_at', '>=', $desde);
+                    }
+                    $query->orderBy('created_at');
+                }])
+                ->first();
+
+            if (!$sensor) {
+                return response()->json([], Response::HTTP_OK);
+            }
+
+            return response()->json([
+                [
+                    'id' => $sensor->id,
+                    'nombre' => $sensor->nombre,
+                    'tipo' => $sensor->tipo,
+                    'estado' => $sensor->estado,
+                    'created_at' => $sensor->created_at,
+                    'updated_at' => $sensor->updated_at,
+                    'lectura' => $sensor->lectura->map(function ($lectura) use ($tipoFiltro) {
+                        $data = $lectura->toArray();
+                        if ($tipoFiltro === 'Temp') unset($data['valor2']);
+                        elseif ($tipoFiltro === 'Hum') unset($data['valor1']);
+                        return $data;
+                    })->values()
+                ]
+            ], Response::HTTP_OK);
+        }
+
+        // Si tipo viene, filtrar por tipo
+        $sensores = Sensor::when($tipoFiltro, function ($q) use ($tipoFiltro) {
+            $q->where('tipo', $tipoFiltro);
+        })
+            ->with(['lectura' => function ($query) use ($desde) {
+                if ($desde) {
+                    $query->where('created_at', '>=', $desde);
+                }
+                $query->orderBy('created_at');
+            }])
+            ->get();
+
+        return response()->json($sensores, Response::HTTP_OK);
     }
+
 
     public function show($id)
     {

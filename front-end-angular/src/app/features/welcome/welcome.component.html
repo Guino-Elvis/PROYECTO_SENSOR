@@ -1,21 +1,127 @@
 <app-layout title="Dashboard">
-  <app-custom-link icon="ph-file" texto="Dashboard"></app-custom-link>
+  <app-custom-link icon="ph-file" texto="Dashboard" />
 
-  <div class="flex justify-center items-center bg-white my-10 px-4 py-4 rounded-md w-auto h-auto">
-      <div class="grid grid-cols-2 w-full">
-        <div>
-          aa
-        </div>
-        <div class="flex flex-col w-full h-full">
-          <div *ngFor="let sensor of sensors" class="sensor-card ">
-            <h2>{{ sensor.nombre }} ({{ sensor.tipo }})</h2>
-            <app-sensor-grafico [sensor]="sensor"></app-sensor-grafico>
-          </div>
-        </div>
-      </div>
+  <!-- Filtro superior -->
+  <div class="flex md:flex-row flex-col justify-between items-start md:items-center gap-4 px-6 pt-8">
+    <h1 class="font-bold text-[#0061a0] text-3xl tracking-tight">
+      Sensores en Tiempo Real
+    </h1>
 
+    <div class="flex gap-4">
+      <!-- Filtro de tipo de sensor -->
+      <select (change)="tipoFilterFromEvent($event)"
+        class="bg-white/90 shadow-md px-4 py-2 border border-gray-200 rounded-xl focus:outline-none focus:ring-[#0061a0] focus:ring-2 text-gray-700 text-sm transition">
+        <option value="">Todos los sensores</option>
+        <option value="Temp">Temperatura</option>
+        <option value="Hum">Humedad</option>
+        <option value="Gases">Gases</option>
+        <option value="CO">Calidad del Aire</option>
+      </select>
+
+      <!-- Filtro de rango de tiempo -->
+      <select (change)="tiempoFilterFromEvent($event)"
+        class="bg-white/90 shadow-md px-4 py-2 border border-gray-200 rounded-xl focus:outline-none focus:ring-[#0061a0] focus:ring-2 text-gray-700 text-sm transition">
+        <option value="60m">Últimos 60 minutos</option>
+        <option value="6h">Últimas 6 horas</option>
+        <option value="12h">Últimas 12 horas</option>
+        <option value="24h" selected>Últimas 24h</option>
+        <option value="7d">Últimos 7 días</option>
+        <option value="30d">Últimos 30 días</option>
+      </select>
+    </div>
   </div>
 
+  <!-- Dashboard Drag & Drop -->
+  <div class="px-6 pt-6 w-full h-[800px]">
+    <gridster [options]="options" class="h-full">
+
+      <!-- Sensores de Temperatura -->
+      <gridster-item *ngFor="let sensor of sensoresTemp" [item]="{ cols: 2, rows: 2 , x: 0, y: 0 }"
+        class="bg-white/80 shadow-lg hover:shadow-2xl backdrop-blur-lg border border-gray-100 rounded-2xl transition-all duration-300">
+        <div class="flex flex-col justify-between p-4 h-full">
+          <div *ngIf="sensor.lectura && sensor.lectura.length > 0">
+            <h2 class="mb-1 font-semibold text-[#0061a0] text-lg capitalize tracking-wide">
+              {{ sensor.nombre }}
+            </h2>
+            <p class="text-gray-500 text-sm">Temperatura actual:</p>
+            <div class="font-bold text-gray-800 text-3xl">
+              {{ getUltimaLectura(sensor)?.valor1 | number:'1.1-1' }}°C
+            </div>
+            <div class="bg-gray-100 shadow-inner mt-4 p-2 rounded-xl text-gray-400 text-xs text-center">
+              <app-grafico-lineal-tem [temperatura]="sensor" [rangoTiempo]="rangoSeleccionado"></app-grafico-lineal-tem>
+
+            </div>
+          </div>
+        </div>
+      </gridster-item>
+
+      <!-- Sensores de Humedad -->
+      <gridster-item *ngFor="let sensor of sensoresHum" [item]="{ cols: 2, rows: 2 , x: 0, y: 0 }"
+        class="bg-white/80 shadow-lg hover:shadow-2xl backdrop-blur-lg border border-gray-100 rounded-2xl transition-all duration-300">
+        <div class="flex flex-col justify-between p-4 h-full">
+          <div *ngIf="sensor.lectura && sensor.lectura.length > 0">
+            <h2 class="mb-1 font-semibold text-[#0061a0] text-lg capitalize tracking-wide">
+              {{ sensor.nombre }}
+            </h2>
+            <p class="text-gray-500 text-sm">Humedad actual:</p>
+            <div class="font-bold text-gray-800 text-3xl">
+              {{ getUltimaLectura(sensor)?.valor2 | number:'1.1-1' }}%
+            </div>
+            <div class="bg-gray-100 shadow-inner mt-4 p-2 rounded-xl text-gray-400 text-xs text-center">
+              <app-grafico-lineal-hum [humedad]="sensor" [rangoTiempo]="rangoSeleccionado"></app-grafico-lineal-hum>
+
+            </div>
+          </div>
+        </div>
+      </gridster-item>
+
+      <!-- Gases -->
+      <gridster-item *ngFor="let sensor of sensoresCalor" [item]="{ cols: 2, rows: 2 , x: 0, y: 0 }"
+        class="bg-white/80 shadow-lg hover:shadow-2xl backdrop-blur-lg border border-gray-100 rounded-2xl transition-all duration-300">
+        <div class="flex flex-col justify-between p-4 h-full">
+          <div *ngIf="sensor.lectura && sensor.lectura.length > 0">
+            <h2 class="mb-1 font-semibold text-[#0061a0] text-lg capitalize tracking-wide">
+              {{ sensor.nombre }}
+            </h2>
+            <p class="text-gray-500 text-sm">PPM actual:</p>
+            <div class="font-bold text-gray-800 text-3xl">
+              {{ getUltimaLectura(sensor)?.valor1 | number:'1.1-1' }} - PPM
+            </div>
+            <div class="bg-gray-100 shadow-inner mt-4 p-2 rounded-xl text-gray-400 text-xs text-center">
+              <app-grafico-calor [calor]="sensor" [rangoTiempo]="rangoSeleccionado"></app-grafico-calor>
+            </div>
+          </div>
+        </div>
+      </gridster-item>
 
 
+      <!-- Aire -->
+      <gridster-item *ngFor="let sensor of sensoresCO" [item]="{ cols: 2, rows: 2 , x: 0, y: 0 }"
+        class="bg-white/80 shadow-lg hover:shadow-2xl backdrop-blur-lg border border-gray-100 rounded-2xl transition-all duration-300">
+        <div class="flex flex-col justify-between p-4 h-full">
+          <div *ngIf="sensor.lectura && sensor.lectura.length > 0">
+            <h2 class="mb-1 font-semibold text-[#0061a0] text-lg capitalize tracking-wide">
+              {{ sensor.nombre }}
+            </h2>
+            <p class="text-gray-500 text-sm">CO₂ actual:</p>
+            <div class="font-bold text-gray-800 text-3xl">
+              {{ getUltimaLectura(sensor)?.valor1 | number:'1.1-1' }} - CO₂
+            </div>
+            <div class="bg-gray-100 shadow-inner mt-4 p-2 rounded-xl text-gray-400 text-xs text-center">
+              <app-grafico-lineal-aire [aire]="sensor" [rangoTiempo]="rangoSeleccionado"></app-grafico-lineal-aire>
+            </div>
+          </div>
+        </div>
+      </gridster-item>
+
+      <!-- Resumen General -->
+      <gridster-item [item]="{ cols: 4, rows: 2 , x: 0, y: 0 }"
+        class="bg-white/90 shadow-lg backdrop-blur-lg p-6 border border-gray-200 rounded-2xl">
+        <div class="flex flex-col justify-center items-center h-full font-bold text-[#0061a0] text-xl">
+          Prediccion del dia
+        </div>
+      </gridster-item>
+
+    </gridster>
+  </div>
 </app-layout>
